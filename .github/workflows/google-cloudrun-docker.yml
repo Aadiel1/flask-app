@@ -24,6 +24,10 @@ jobs:
     # Configure GCP
     - name: Set up GCP project
       run: gcloud config set project ${{ secrets.GCP_PROJECT }}
+    - name: Debug Project
+      run: echo "GCP Project: ${{ secrets.GCP_PROJECT }}"
+
+
 
     # Build Docker image
     - name: Build and push Docker image

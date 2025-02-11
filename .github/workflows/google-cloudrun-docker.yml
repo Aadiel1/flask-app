@@ -21,10 +21,11 @@ jobs:
       with:
         credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-    # Set up the GCP project
+    # Set up GCP project
     - name: Set up GCP project
-      run: gcloud config set project ${{ secrets.GCP_PROJECT }}
-      
+      run: |
+        gcloud config set project ${{ secrets.GCP_PROJECT }}
+
     # Debug: Output project for confirmation
     - name: Debug Project
       run: echo "GCP Project: ${{ secrets.GCP_PROJECT }}"

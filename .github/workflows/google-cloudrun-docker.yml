@@ -26,27 +26,30 @@ jobs:
       run: |
         gcloud config set project ${{ secrets.GCP_PROJECT }}
 
-    # Debug: Output project for confirmation
+    # Debug: Output GCP project name for confirmation
     - name: Debug Project
-      run: echo "GCP Project: ${{ secrets.GCP_PROJECT }}"
+      run: |
+        echo "GCP Project: ${{ secrets.GCP_PROJECT }}"
+
+    # Configure Docker for Artifact Registry
+    - name: Configure Docker for GCP Artifact Registry
+      run: |
+        gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev
 
     # Build Docker image
     - name: Build and push Docker image
       run: |
-        # Configure Docker to use GCP's Artifact Registry
-        gcloud auth configure-docker "${{ secrets.GCP_REGION }}-docker.pkg.dev"
-        
         # Build Docker image and tag it
-        docker build -t "${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/cloud-run/flask-app:${{ github.sha }}" .
+        docker build -t ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/cloud-run/flask-app:${{ github.sha }} .
         
         # Push Docker image to Artifact Registry
-        docker push "${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/cloud-run/flask-app:${{ github.sha }}"
+        docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/cloud-run/flask-app:${{ github.sha }}
 
     # Deploy to Cloud Run
     - name: Deploy to Cloud Run
       run: |
         gcloud run deploy flask-app \
-          --image "${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/cloud-run/flask-app:${{ github.sha }}" \
+          --image ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/cloud-run/flask-app:${{ github.sha }} \
           --platform managed \
           --region ${{ secrets.GCP_REGION }} \
           --allow-unauthenticated
